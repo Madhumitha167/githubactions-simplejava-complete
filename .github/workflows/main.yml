@@ -18,6 +18,14 @@ jobs:
         cache: maven
     - name: Compile with maven
       run: mvn clean compile 
+    - name: SonarQube Actions
+  # You may pin to the exact commit or the version.
+  # uses: achilleslinux/sonarqube-actions@7cfc2572aba766b0ebebaba974e82065863ab20c
+      uses: achilleslinux/sonarqube-actions@achilleslinux
+      with:
+    # SonarQube server URL
+        host: http://54.255.143.94:9000/
+        login: ${{ secrets.sonar_token }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     
