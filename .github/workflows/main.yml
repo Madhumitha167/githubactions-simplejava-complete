@@ -36,14 +36,14 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
         run: mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       - name: Build with Maven
-        run: mvn -B package --file Maven/pom.xml
+        run: mvn -B package --file pom.xml
         working-directory: ${{ github.workspace }}
       - name: Set JAR file location as an environment variable
         run: echo "JAR_FILE_PATH=$(ls -d Maven/target/*.jar)" >> $GITHUB_ENV
       - name: Display JAR file location
         run: echo "JAR file is located at:$JAR_FILE_PATH"
-      - name: Show Contents of Maven/target Directory
-        run: ls -R Maven/target
+      - name: Show Contents of target Directory
+        run: ls -R /target
       - name: Debug Docker Context
         run: |
           pwd
