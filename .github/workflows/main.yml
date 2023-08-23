@@ -37,7 +37,7 @@ jobs:
         run: mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       - name: Check for WAR file
         run: |
-          if [ -f "target/*.war" ]; then
+          if [ -n "$(find target -maxdepth 1 -name '*.war' -print -quit)" ]; then
             echo "WAR file found."
           else
             echo "WAR file not found."
