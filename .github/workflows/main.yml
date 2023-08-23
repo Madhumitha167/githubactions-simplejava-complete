@@ -43,3 +43,5 @@ jobs:
             echo "jAR file not found."
             exit 1
           fi
+      - name: Show Contents of /target Directory
+        run: ls -R $GITHUB_WORKSPACE/target
