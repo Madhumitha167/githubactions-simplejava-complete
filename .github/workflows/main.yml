@@ -35,3 +35,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      - name: Check for WAR file
+        run: |
+          if [ -f "target/*.war" ]; then
+            echo "WAR file found."
+          else
+            echo "WAR file not found."
+            exit 1
+          fi
