@@ -46,6 +46,7 @@ jobs:
       - name: Show Contents of /target Directory
         run: ls -R $GITHUB_WORKSPACE/target
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
