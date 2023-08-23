@@ -4,7 +4,7 @@ metadata:
   name: javaspringboot-service
 spec:
   selector:
-    app: javaspringbootapp
+    app: javaspringboot
   ports:
     - protocol: TCP
       port: 80
