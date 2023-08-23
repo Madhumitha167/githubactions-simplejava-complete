@@ -45,6 +45,12 @@ jobs:
           fi
       - name: Show Contents of /target Directory
         run: ls -R $GITHUB_WORKSPACE/target
+      - name: Show Contents of Maven/target Directory
+        run: ls -R Maven/target
+      - name: Debug Docker Context
+        run: |
+          pwd
+          ls -R   
   deploy:
     needs: build
     runs-on: ubuntu-latest
