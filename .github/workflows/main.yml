@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+        run: mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       - name: Check for WAR file
         run: |
           if [ -f "target/*.war" ]; then
