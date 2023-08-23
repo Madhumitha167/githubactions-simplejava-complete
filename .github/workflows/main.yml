@@ -1,92 +1,80 @@
-name: Build and Deploy
-
+name: Build
 on:
   push:
     branches:
-      - master
+      - master # the name of your main branch
   pull_request:
     types: [opened, synchronize, reopened]
-
 jobs:
   build:
-    name: Build and Analyze
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v1
         with:
           java-version: 17
-
       - name: Cache SonarQube packages
-        uses: actions/cache@v2
+        uses: actions/cache@v1
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v1
         with:
-          path: ~/.m2/repository
+          path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-
-      - name: Build and Analyze with SonarQube
+      - name: Build and analyze
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
         run: mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-
-      - name: Check for JAR file
+      - name: Check for jar file
         run: |
           if [ -n "$(find target -maxdepth 1 -name '*.jar' -print -quit)" ]; then
-            echo "JAR file found."
+            echo "jAR file found."
           else
-            echo "JAR file not found."
+            echo "jAR file not found."
             exit 1
           fi
-
       - name: Show Contents of /target Directory
         run: ls -R $GITHUB_WORKSPACE/target
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_UNAME }}
+        password: ${{ secrets.DOCKER_PASS }}
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t madhu1607/newjavaapp1:latest .
+        docker push madhu1607/newjavaapp1:latest
+    
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v2.0
+      with:
+        version: 'v1.27.0' # default is latest stable
+      id: install
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+        aws-region: ap-southeast-1
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_UNAME }}
-          password: ${{ secrets.DOCKER_PASS }}
-
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t madhu1607/newjavaapp1:latest .
-          docker push madhu1607/newjavaapp1:latest
-
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v2
-        with:
-          version: 'v1.27.0'
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
-
-      - name: Update kube config
-        run: aws eks update-kubeconfig --name finaldeploycluster
-
-      - name: Deploy to EKS
-        run: |
-          kubectl apply -f deployment.yml
-          kubectl apply -f service.yml
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name finaldeploycluster
+    - name: Deploy to EKS
+      run: |
+        kubectl apply -f deployment.yml
+        kubectl apply -f service.yml 
