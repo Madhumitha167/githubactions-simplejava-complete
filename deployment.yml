@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: javaspringboot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: javaspringboot
+  template:
+    metadata:
+      labels:
+        app: javaspringboot
+    spec:
+      containers:
+      - name: javaspringboot-container
+        image: madhu1607/newjavaapp1:latest  
+        ports:
+        - containerPort: 80
