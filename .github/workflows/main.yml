@@ -35,11 +35,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
         run: mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-      - name: Check for WAR file
+      - name: Check for jar file
         run: |
-          if [ -n "$(find target -maxdepth 1 -name '*.war' -print -quit)" ]; then
-            echo "WAR file found."
+          if [ -n "$(find target -maxdepth 1 -name '*.jar' -print -quit)" ]; then
+            echo "jAR file found."
           else
-            echo "WAR file not found."
+            echo "jAR file not found."
             exit 1
           fi
