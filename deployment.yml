@@ -16,4 +16,4 @@ spec:
       - name: javaspringboot-container
         image: madhu1607/newjavaapp1:latest  
         ports:
-        - containerPort: 80
+        - containerPort: 8080
