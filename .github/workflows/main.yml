@@ -38,6 +38,17 @@ jobs:
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       - name: Build and test project with Maven
         run: mvn -B package --file pom.xml
+      - name: Nexus Repo Publish
+        uses: sonatype-nexus-community/nexus-repo-github-action@master
+        with:
+          serverUrl: http://54.158.192.73:8081/
+          username: ${{ secrets.NEXUS_UNAME }}
+          password: ${{ secrets.NEXUS_PASS }}
+          format: maven2
+          repository: madhuproject
+          coordinates: groupId=com.example artifactId=app version=1.0.0
+          assets: extension=jar
+          filename: ./target/SimpleSpringAPI-0.0.1-SNAPSHOT.jar
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
