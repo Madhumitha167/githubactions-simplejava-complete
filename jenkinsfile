@@ -5,64 +5,46 @@ pipeline {
         maven 'maven3'
     }
     stages{
-        stage("Checkout"){
-            steps{
-                git branch: 'main', url: 'https://github.com/Madhumitha167/demoAPI.git'
-            }
-        }
         stage("Compile"){
             steps{
-                dir('demoApi') {
-                  sh "mvn clean compile"
-              }
+                sh "mvn clean compile"
             }
         }
         stage("Test Cases"){
             steps{
-                dir('demoApi'){
-                  sh "mvn test"
-                }
+                sh "mvn test"
             }
         }
         stage("Sonarqube analysis"){
             environment{
-                SONAR_URL = "http://13.212.27.88:9000/"
+                SONAR_URL = "http://35.175.105.51:9000/"
             }
             steps{
-                 dir('demoApi'){
-                   withCredentials([string(credentialsId:'Sonar-token', variable: 'SONAR_TOKEN')]){
-                   sh "mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dsonar.host.url=${SONAR_URL}"
-                   }
-                       
-                }
+               withCredentials([string(credentialsId:'sonar-token', variable: 'SONAR_TOKEN')]){
+                 sh "mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dsonar.host.url=${SONAR_URL}"
+            }
             }
         }
         stage("Build"){
             steps{
-                dir('demoApi'){
-                  sh "mvn clean install"
-                }
+                sh "mvn clean install"
             }
         }
         stage("OWASP Dependency Check"){
             steps{
-                 dir('demoApi'){
-                   dependencyCheck additionalArguments: '--scan ./ ' , odcInstallation: 'Dp-check'
-                   dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-                 }
+               dependencyCheck additionalArguments: '--scan ./ ' , odcInstallation: 'DP-Check'
+               dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
         stage("Build and push docker images"){
             steps{
-                  script{
-                    withDockerRegistry(credentialsId: 'Docker-credentials', toolName: 'docker') {
-                    dir('demoApi'){
-                     sh "docker build -t image1 ." 
-                     sh "docker tag image1 madhu1607/basic:latest "
-                     sh "docker push madhu1607/basic:latest"
-                     sh "docker run -d -p 8070:8080 madhu1607/basic"
+                script{
+                  withDockerRegistry(credentialsId: 'docker-credentials', toolName: 'docker') {
+                     sh "docker build -t myimage123 ." 
+                     sh "docker tag myimage1 madhu1607/jenkinsapp2:latest "
+                     sh "docker push madhu1607/jenkinsapp2:latest"
+                     sh "docker run -d -p 9201:8080 madhu1607/jenkinsapp2 "
                     }  
-                    }
                 }
             }
         }
