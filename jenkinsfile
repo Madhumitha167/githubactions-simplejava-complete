@@ -41,7 +41,7 @@ pipeline {
                 script{
                   withDockerRegistry(credentialsId: 'docker-credentials', toolName: 'docker') {
                      sh "docker build -t myimage123 ." 
-                     sh "docker tag myimage1 madhu1607/jenkinsapp2:latest "
+                     sh "docker tag myimage123 madhu1607/jenkinsapp2:latest "
                      sh "docker push madhu1607/jenkinsapp2:latest"
                      sh "docker run -d -p 9201:8080 madhu1607/jenkinsapp2 "
                     }  
